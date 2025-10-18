@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+/* ====== Tema padrão (dark) ====== */
+:root {
+  /* superfícies / textos (já existiam) */
+  --bg:   #0f172a;
+  --soft: #0b1220;
+  --card: #111827;
+
+  --fg:     #ffffff;
+  --muted:  rgba(255,255,255,.70);
+  --ring:   rgba(255,255,255,.12);
+  --ring-2: rgba(255,255,255,.20);
+  --thead:  rgba(255,255,255,.04);
+
+  /* ===== Paleta portadas do MUI ===== */
+  /* primary */
+  --primary:        #4E9594;
+  --primary-light:  #5CB0AB;
+  --primary-dark:   #195460;
+  --on-primary:     #ffffff;
+
+  /* secondary */
+  --secondary:        #D54C46;
+  --secondary-light:  #A0AEC0; /* (no MUI estava como light do secondary, mantive) */
+  --secondary-dark:   #4A5568;
+  --on-secondary:     #ffffff;
+
+  /* semantic */
+  --error:   #E53E3E;
+  --warning: #E66E6A;
+  --info:    #1E9DC6;
+  --success: #4E9594;
+
+  /* background variantes do MUI (úteis no tema claro) */
+  --bg-default:   #0f172a; /* dark override */
+  --bg-paper:     #111827;
+  --bg-container: #0b1220;
+  --bg-blueLight: #77D7F5;
+
+  /* texto */
+  --text-primary:   #ffffff;
+  --text-secondary: #41797A;
+  --text-disabled:  #A0AEC0;
+  --text-black:     #111;
+  --text-white:     #fff;
+
+  /* scrollbar (dark) */
+  --scrollbar-track: #0b1220;
+  --scrollbar-thumb: #2f855a;
+  --scrollbar-thumb-hover: #276749;
+}
+
+/* ====== Tema claro ====== */
+:root[data-theme="dark"] {
+  --bg:   #f8fafc;  /* slate-50 */
+  --soft: #EDF2F7;  /* MUI background.default */
+  --card: #ffffff;
+
+  --fg:     #0b1220;
+  --muted:  rgba(2,6,23,.65);
+  --ring:   rgba(2,6,23,.10);
+  --ring-2: rgba(2,6,23,.16);
+  --thead:  rgba(0,0,0,.04);
+
+  /* primary/secondary mantêm as mesmas cores do MUI */
+  --primary:        #4E9594;
+  --primary-light:  #5CB0AB;
+  --primary-dark:   #195460;
+  --on-primary:     #ffffff;
+
+  --secondary:        #D54C46;
+  --secondary-light:  #A0AEC0;
+  --secondary-dark:   #4A5568;
+  --on-secondary:     #ffffff;
+
+  --error:   #E53E3E;
+  --warning: #E66E6A;
+  --info:    #1E9DC6;
+  --success: #4E9594;
+
+  --bg-default:   #EDF2F7;
+  --bg-paper:     #ffffff;
+  --bg-container: #F7FAFC;
+  --bg-blueLight: #77D7F5;
+
+  --text-primary:   #111;
+  --text-secondary: #41797A;
+  --text-disabled:  #A0AEC0;
+  --text-black:     #111;
+  --text-white:     #fff;
+
+  /* scrollbar (light) */
+  --scrollbar-track: #fff;
+  --scrollbar-thumb: #4E9594;
+  --scrollbar-thumb-hover: #3d7a79;
+}
+
+/* base */
+html, body, #root { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+/* Scrollbar (equivalente ao CssBaseline) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+
+/* Pequenos utilitários para badges */
+.badge {
+  @apply rounded-full px-2 py-0.5 ring-1 text-xs;
+}
+.badge-success { background: color-mix(in oklab, var(--success) 15%, transparent); color: var(--success); border-color: color-mix(in oklab, var(--success) 40%, transparent); }
+.badge-warn    { background: color-mix(in oklab, var(--warning) 15%, transparent); color: var(--warning); border-color: color-mix(in oklab, var(--warning) 40%, transparent); }
