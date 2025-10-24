@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, ArrowsUpFromLine } from 'lucide-react';
+import { CalendarDays, ArrowsUpFromLine, MessageCircle } from 'lucide-react';
 
 import { useHospital } from '../../contexts/HospitalContext';
 import api from '../../services/api';
@@ -230,6 +230,15 @@ export default function Dashboard() {
     toggleSort(sortKey as keyof Row);
   };
 
+  const handleOpenNotes = (appointmentId: string) => {
+    const appt = appointments.find((a) => a.id === appointmentId);
+    setModal({
+      appointmentId,
+      action: 'VERIFY_WITH_DOCTOR',
+      doctorName: appt?.user?.name ?? 'Médico',
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* título e cabeçalho */}
@@ -452,9 +461,29 @@ export default function Dashboard() {
             ) : (
               sorted.map((item) => (
                 <tr key={item.id} className="border-t border-[var(--ring)]/60">
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 flex items-center gap-1">
+                    {item?.user?.cellphone && (
+                      <a
+                        href={`https://wa.me/${
+                          item.user.cellphone
+                            ?.replace(/\D/g, '') // mantém só números
+                            ?.replace(/^55/, '') // remove o 55 inicial, se tiver
+                            ?.replace(/^0+/, '') // remove zeros à esquerda
+                            ?.padStart(13, '55') // garante que sempre tenha o 55 no início
+                        }`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={`Conversar com ${item.user.name} no WhatsApp`}
+                        className="text-green-500 hover:text-green-600 transition-colors"
+                      >
+                        <MessageCircle size={18} />
+                      </a>
+                    )}
                     <span className="align-middle">{item?.user?.name}</span>
-                    <NotesBadge count={notesCountMap[item.id] ?? 0} />
+                    <NotesBadge
+                      count={notesCountMap[item.id] ?? 0}
+                      onClick={() => handleOpenNotes(item.id)}
+                    />
                   </td>
                   <td className="px-4 py-3">
                     <span className="inline-flex rounded-full bg-[var(--on-secondary)] px-2.5 py-1 text-xs ring-1 ring-[var(--ring)]">
