@@ -49,7 +49,6 @@ export default function DashboardFilters({
           <option value="ATRASADO">Atrasado</option>
           <option value="CONCLUIDO">Concluído</option>
           <option value="AUSENTE">Ausente</option>
-          <option value="PENDENTE">Pendente</option>
         </select>
 
         <div className="flex gap-2">
