@@ -88,25 +88,48 @@ export default function Dashboard() {
 
     setLoading(true);
     try {
-      const response = await api.get(
-        `/appointment/admin/year/${getCurrentYear(today)}/month/${
-          getCurrentMonth(today) + 1
-        }/day/${getCurrentDate(today)}/byHospital/${
-          currentHospital.value
-        }/byName/${currentName}`
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+
+      const parts = (d: Date) => ({
+        y: d.getFullYear(),
+        m: d.getMonth() + 1,
+        day: d.getDate(),
+      });
+
+      const t = parts(today);
+      const y = parts(yesterday);
+
+      const baseUrl = (p: { y: number; m: number; day: number }) =>
+        `/appointment/admin/year/${p.y}/month/${p.m}/day/${p.day}` +
+        `/byHospital/${currentHospital.value}/byName/${currentName}`;
+
+      // busca em paralelo: ontem + hoje
+      const [resYesterday, resToday] = await Promise.all([
+        api.get(baseUrl(y)),
+        api.get(baseUrl(t)),
+      ]);
+
+      const rawY = (resYesterday.data ?? []) as Appointment[];
+      const rawT = (resToday.data ?? []) as Appointment[];
+
+      // une e deduplica por id
+      const mergedUnique = Array.from(
+        new Map([...rawY, ...rawT].map((a) => [a.id, a])).values()
       );
 
-      const data = (response.data ?? []) as Appointment[];
-
+      // se o usuário digitou algo (>=3 chars no seu fluxo), mantém seu filtro local de expertise
       const base =
         currentName === 'listall' || currentName.length < 3
-          ? data
-          : data.filter((a) =>
+          ? mergedUnique
+          : mergedUnique.filter((a) =>
               a.expertise?.name
                 ?.toLowerCase()
                 .includes(currentName.toLowerCase())
             );
 
+      // calcula status (sem “PENDENTE”)
       const withStatus = base.map((it) => computeStatus(it));
       setAppointments(withStatus);
     } finally {
@@ -239,6 +262,27 @@ export default function Dashboard() {
     });
   };
 
+  function formatPtShortDate(d: Date | string) {
+    const date = new Date(d);
+    const wd = date
+      .toLocaleDateString('pt-BR', { weekday: 'short' })
+      .replace('.', '');
+    const dm = date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+    });
+    return `${wd} • ${dm}`;
+  }
+
+  function formatDurationH(duration?: number | null) {
+    if (!duration && duration !== 0) return '—';
+    const totalMin = Math.round(Number(duration) * 60);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    if (m === 0) return `${h}h`;
+    return `${h}h ${m}m`;
+  }
+
   return (
     <div className="space-y-6">
       {/* título e cabeçalho */}
@@ -347,7 +391,6 @@ export default function Dashboard() {
               <option value="ATRASADO">Atrasado</option>
               <option value="CONCLUIDO">Concluído</option>
               <option value="AUSENTE">Ausente</option>
-              <option value="PENDENTE">Pendente</option>
             </select>
 
             <div className="flex gap-2">
@@ -433,6 +476,8 @@ export default function Dashboard() {
                 onClick={() => toggleSort('_expertise')}
               />
               <th className="px-4 py-3 font-medium">Horário</th>
+              <th className="px-4 py-3 font-medium">Dia de Entrada</th>
+              <th className="px-4 py-3 font-medium">Duração</th>
               <TableHeaderSort
                 label="Status"
                 active={sortKey === '_status'}
@@ -499,12 +544,18 @@ export default function Dashboard() {
                       return `${start} — ${end}`;
                     })()}
                   </td>
+                  <td className="px-4 py-3">{formatPtShortDate(item.date)}</td>
                   <td className="px-4 py-3">
-                    <StatusBadge
-                      status={item.status || 'PENDENTE'}
-                      lateStart={item._lateStart}
-                      earlyStop={item._earlyStop}
-                    />
+                    {formatDurationH(item.duration as number)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {item.status && (
+                      <StatusBadge
+                        status={item.status}
+                        lateStart={item._lateStart}
+                        earlyStop={item._earlyStop}
+                      />
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     {item?.start_checkin

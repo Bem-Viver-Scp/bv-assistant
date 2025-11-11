@@ -16,6 +16,29 @@ type Props = {
   onSelectAction: (id: string, action: ActionKey) => void;
 };
 
+/** Helpers locais */
+function formatPtShortDate(d: Date | string) {
+  const date = new Date(d);
+  // ex.: "sex • 08/11"
+  const wd = date
+    .toLocaleDateString('pt-BR', { weekday: 'short' })
+    .replace('.', '');
+  const dm = date.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+  });
+  return `${wd} • ${dm}`;
+}
+
+function formatDurationH(duration?: number | null) {
+  if (!duration && duration !== 0) return '—';
+  const totalMin = Math.round(Number(duration) * 60);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
+
 export default function MobileRowCard({
   item,
   notesCount,
@@ -27,6 +50,9 @@ export default function MobileRowCard({
   const end = getFormatHours(
     addHours(item.date, (item.duration as number) ?? 0)
   );
+
+  const entryDay = formatPtShortDate(item.date);
+  const durationLabel = formatDurationH(item.duration as number);
 
   return (
     <div className="rounded-2xl bg-[var(--card)] ring-1 ring-[var(--ring)] p-3 space-y-2">
@@ -40,20 +66,33 @@ export default function MobileRowCard({
             {item?.hospital?.name ?? '—'}
           </p>
         </div>
-        <StatusBadge
-          status={item.status || 'PENDENTE'}
-          lateStart={item._lateStart}
-          earlyStop={item._earlyStop}
-        />
+        {item.status && (
+          <StatusBadge
+            status={item.status}
+            lateStart={item._lateStart}
+            earlyStop={item._earlyStop}
+          />
+        )}
       </div>
 
+      {/* Linha de “chips” (especialidade, horário, dia e duração) */}
       <div className="flex flex-wrap items-center gap-2">
         <span className="inline-flex rounded-full bg-[var(--on-secondary)] px-2.5 py-1 text-xs ring-1 ring-[var(--ring)]">
           {item?.expertise?.name}
         </span>
+
         <span className="text-xs text-[var(--muted)]">
           {start} — {end}
         </span>
+
+        <span className="inline-flex rounded-full bg-[var(--on-secondary)] px-2 py-0.5 text-[11px] ring-1 ring-[var(--ring)]">
+          {entryDay}
+        </span>
+
+        <span className="inline-flex rounded-full bg-[var(--on-secondary)] px-2 py-0.5 text-[11px] ring-1 ring-[var(--ring)]">
+          {durationLabel}
+        </span>
+
         {item?.transfering && (
           <span className="inline-flex rounded-full px-2.5 py-1 text-xs ring-1 ring-[var(--ring)]">
             Oferta Aberta

@@ -1,14 +1,7 @@
 // utilidades e cálculo de status dos plantões
-
 import type { Appointment as DTOAppointment } from '../dtos';
 
-export type Status =
-  | 'ATIVO'
-  | 'ATRASADO'
-  | 'CONCLUIDO'
-  | 'AUSENTE'
-  | 'PENDENTE'
-  | string;
+export type Status = 'ATIVO' | 'ATRASADO' | 'CONCLUIDO' | 'AUSENTE' | string;
 
 export function addHours(date: Date | string, hours: number) {
   const d = new Date(date);
@@ -20,7 +13,7 @@ export function addMinutes(date: Date | string, minutes: number) {
 }
 
 export type Appointment = DTOAppointment & {
-  status?: Status;
+  status?: Status; // <- pode não existir
   _lateStart?: boolean;
   _earlyStop?: boolean;
 };
@@ -34,12 +27,11 @@ export function computeStatus(a: DTOAppointment): Appointment {
   const start = a.start_checkin ? new Date(a.start_checkin) : null;
   const stop = a.stop_checkin ? new Date(a.stop_checkin) : null;
 
-  // tolerância em minutos, default 0
   const tolMin = Number(a?.hospital?.min_tolerance ?? 0);
   const startWithTol = addMinutes(scheduledStart, tolMin);
   const endMinusTol = addMinutes(scheduledEnd, -tolMin);
 
-  let status: Status = 'PENDENTE';
+  let status: Status | undefined; // <- sem default
   let _lateStart = false;
   let _earlyStop = false;
 
@@ -65,5 +57,6 @@ export function computeStatus(a: DTOAppointment): Appointment {
     return { ...(a as Appointment), status };
   }
 
+  // Sem status (sem badge)
   return { ...(a as Appointment), status };
 }
