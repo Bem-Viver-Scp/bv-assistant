@@ -51,14 +51,13 @@ export default function Login() {
   return (
     <div className="min-h-screen grid place-items-center px-4 bg-[var(--primary)]">
       <div className="w-full max-w-sm rounded-2xl bg-[var(--card)] ring-1 ring-[var(--ring)] p-6">
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex justify-center mb-6">
           <img
-            src="/logo.svg"
-            alt="Bem Viver Logotipo"
-            width={40}
-            height={40}
+            src="/cobreai-login.png"
+            alt="Cobre AI Logotipo"
+            width={220}
+            height={63}
           />
-          <h1 className="text-lg font-semibold">Bem Viver • Assistente</h1>
         </div>
 
         <div className="space-y-3">

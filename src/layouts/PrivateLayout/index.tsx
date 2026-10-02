@@ -44,12 +44,12 @@ export default function PrivateLayout() {
           {/* esquerda */}
           <div className="flex items-center gap-3">
             <img
-              src="/logo.svg"
-              alt="Bem Viver Logotipo"
+              src="/cobreai-logo-sm.png"
+              alt="Cobre AI Logotipo"
               width={36}
               height={36}
             />
-            <span className="font-semibold text-white">Bem Viver</span>
+            <span className="font-semibold text-white">Cobreai</span>
           </div>
 
           {/* direita: empilha no mobile */}
